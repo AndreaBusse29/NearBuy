@@ -1,0 +1,100 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+NearBuy is a Progressive Web App (PWA) that helps users track their favorite products and alerts them when they go on sale at their favorite stores.
+
+## Technology Stack
+
+- TypeScript (compiled to ES2020)
+- HTML5 / CSS3
+- Service Workers for offline functionality
+- LocalStorage for data persistence
+- Web Notifications API for price alerts
+
+## Project Structure
+
+```
+NearBuy/
+├── index.html           # Main HTML file
+├── manifest.json        # PWA manifest configuration
+├── tsconfig.json        # TypeScript configuration
+├── src/
+│   ├── types.ts         # TypeScript type definitions
+│   ├── app.ts           # Main application logic & state management
+│   └── service-worker.ts # Service worker for offline support & caching
+├── dist/                # Compiled JavaScript output (generated)
+├── css/
+│   └── styles.css       # Main stylesheet
+└── icons/               # PWA icons (various sizes)
+```
+
+## Development Commands
+
+```bash
+# Install dependencies
+npm install
+
+# Build TypeScript files
+npm run build
+
+# Build in watch mode (auto-rebuild on changes)
+npm run watch
+
+# Start development server (builds first)
+npm start
+
+# Start dev mode (watch + server in parallel)
+npm run dev
+
+# Access the app at http://localhost:8080
+```
+
+## Architecture
+
+### Service Worker (src/service-worker.ts)
+- Implements cache-first strategy for offline functionality
+- Handles push notifications for price alerts
+- Background sync for periodic price checks (placeholder for API integration)
+- Caches static assets (HTML, CSS, JS, manifest)
+- Fully typed with TypeScript service worker types
+
+### Main Application (src/app.ts)
+- State management using in-memory array + localStorage persistence
+- Product CRUD operations (Create, Read, Delete)
+- Modal-based UI for adding products
+- XSS protection with HTML escaping
+- Notification permission handling
+- Fully typed with TypeScript interfaces
+
+### Type Definitions (src/types.ts)
+- `Product`: Core data model for tracked products
+- `DOMElements`: Typed DOM element references
+- `PriceAlertOptions`: Notification configuration
+- `STORAGE_KEY`: Constant for localStorage key
+
+### Data Model
+Products stored in localStorage with structure:
+```javascript
+{
+  id: number,           // Timestamp-based unique ID
+  name: string,         // Product name
+  url: string,          // Product URL at store
+  store: string,        // Store name
+  price: number,        // Current price
+  targetPrice: number,  // Desired price for alert
+  dateAdded: string     // ISO timestamp
+}
+```
+
+## Future Development
+
+- API integration for automated price checking
+- Backend service for price monitoring
+- User authentication and cloud sync
+- Price history tracking and charts
+- Support for multiple stores per product
+- Browser extension for quick product addition
+- Push notification server for real-time alerts

@@ -1,0 +1,25 @@
+{
+  "name": "nearbuy",
+  "version": "1.0.0",
+  "description": "A Progressive Web App that helps users track their favorite products and alerts them when they go on sale",
+  "main": "index.html",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "npm run build && npx http-server -p 8080 -c-1",
+    "dev": "npm run watch & npx http-server -p 8080 -c-1"
+  },
+  "keywords": [
+    "pwa",
+    "shopping",
+    "price-tracker",
+    "sales-alerts"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "http-server": "^14.1.1",
+    "typescript": "^5.3.3"
+  }
+}
