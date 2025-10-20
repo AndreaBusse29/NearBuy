@@ -1,0 +1,139 @@
+<script setup lang="ts">
+import { ref, watch } from 'vue';
+import { Product } from '../types';
+
+// Props
+interface Props {
+  isOpen: boolean;
+}
+
+const props = defineProps<Props>();
+
+// Emits
+const emit = defineEmits<{
+  close: [];
+  'add-product': [product: Product];
+}>();
+
+// Form data
+const productName = ref('');
+const productUrl = ref('');
+const productStore = ref('');
+const productPrice = ref<number | null>(null);
+const targetPrice = ref<number | null>(null);
+
+// Reset form when modal closes
+watch(() => props.isOpen, (newValue) => {
+  if (!newValue) {
+    resetForm();
+  }
+});
+
+// Reset form
+const resetForm = (): void => {
+  productName.value = '';
+  productUrl.value = '';
+  productStore.value = '';
+  productPrice.value = null;
+  targetPrice.value = null;
+};
+
+// Handle form submission
+const handleSubmit = (): void => {
+  if (!productPrice.value || !targetPrice.value) return;
+
+  const product: Product = {
+    id: Date.now(),
+    name: productName.value,
+    url: productUrl.value,
+    store: productStore.value,
+    price: productPrice.value,
+    targetPrice: targetPrice.value,
+    dateAdded: new Date().toISOString(),
+  };
+
+  emit('add-product', product);
+};
+
+// Handle modal background click
+const handleModalClick = (e: MouseEvent): void => {
+  if (e.target === e.currentTarget) {
+    emit('close');
+  }
+};
+</script>
+
+<template>
+  <div
+    v-if="isOpen"
+    id="add-product-modal"
+    class="modal"
+    @click="handleModalClick"
+  >
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add Product</h3>
+        <button class="close-modal" @click="emit('close')">&times;</button>
+      </div>
+      <form id="add-product-form" @submit.prevent="handleSubmit">
+        <div class="form-group">
+          <label for="product-name">Product Name</label>
+          <input
+            id="product-name"
+            v-model="productName"
+            type="text"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="product-url">Product URL</label>
+          <input
+            id="product-url"
+            v-model="productUrl"
+            type="url"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="product-store">Store</label>
+          <input
+            id="product-store"
+            v-model="productStore"
+            type="text"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="product-price">Current Price (€)</label>
+          <input
+            id="product-price"
+            v-model.number="productPrice"
+            type="number"
+            step="0.01"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="target-price">Target Price (€)</label>
+          <input
+            id="target-price"
+            v-model.number="targetPrice"
+            type="number"
+            step="0.01"
+            required
+          />
+        </div>
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-secondary"
+            @click="emit('close')"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary">Add Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>
