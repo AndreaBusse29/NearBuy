@@ -2,9 +2,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { mount, VueWrapper } from '@vue/test-utils';
 import AddProductModal from '../AddProductModal.vue';
 import BaseModal from '../BaseModal.vue';
+import type { Shop } from '../../types';
 
 describe('AddProductModal', () => {
   let wrapper: VueWrapper;
+  const mockStores: Shop[] = [
+    { id: 1, name: 'Amazon', url: 'https://www.amazon.com', dateAdded: '2025-01-01' },
+    { id: 2, name: 'Best Buy', url: 'https://www.bestbuy.com', dateAdded: '2025-01-02' },
+  ];
 
   beforeEach(() => {
     // Create a div with id="app" for teleport target
@@ -25,6 +30,7 @@ describe('AddProductModal', () => {
       wrapper = mount(AddProductModal, {
         props: {
           isOpen: true,
+          stores: mockStores,
         },
       });
 
@@ -36,6 +42,7 @@ describe('AddProductModal', () => {
       wrapper = mount(AddProductModal, {
         props: {
           isOpen: true,
+          stores: mockStores,
         },
       });
 
@@ -47,6 +54,7 @@ describe('AddProductModal', () => {
       wrapper = mount(AddProductModal, {
         props: {
           isOpen: true,
+          stores: mockStores,
         },
       });
 
@@ -56,6 +64,37 @@ describe('AddProductModal', () => {
       expect(document.querySelector('#product-price')).toBeTruthy();
       expect(document.querySelector('#target-price')).toBeTruthy();
     });
+
+    it('should render store dropdown with available stores', () => {
+      wrapper = mount(AddProductModal, {
+        props: {
+          isOpen: true,
+          stores: mockStores,
+        },
+      });
+
+      const storeSelect = document.querySelector('#product-store') as HTMLSelectElement;
+      expect(storeSelect).toBeTruthy();
+      expect(storeSelect.tagName).toBe('SELECT');
+
+      const options = storeSelect.querySelectorAll('option');
+      // Should have: 1 placeholder + 2 stores = 3 options
+      expect(options.length).toBe(3);
+      expect(options[1].textContent).toBe('Amazon');
+      expect(options[2].textContent).toBe('Best Buy');
+    });
+
+    it('should show help text when no stores available', () => {
+      wrapper = mount(AddProductModal, {
+        props: {
+          isOpen: true,
+          stores: [],
+        },
+      });
+
+      const helpText = document.querySelector('#store-help-text');
+      expect(helpText?.textContent).toContain('No stores available');
+    });
   });
 
   describe('form interaction', () => {
@@ -63,12 +102,13 @@ describe('AddProductModal', () => {
       wrapper = mount(AddProductModal, {
         props: {
           isOpen: true,
+          stores: mockStores,
         },
       });
 
       const nameInput = document.querySelector('#product-name') as HTMLInputElement;
       const urlInput = document.querySelector('#product-url') as HTMLInputElement;
-      const storeInput = document.querySelector('#product-store') as HTMLInputElement;
+      const storeSelect = document.querySelector('#product-store') as HTMLSelectElement;
       const priceInput = document.querySelector('#product-price') as HTMLInputElement;
       const targetPriceInput = document.querySelector('#target-price') as HTMLInputElement;
 
@@ -78,8 +118,8 @@ describe('AddProductModal', () => {
       urlInput.value = 'https://example.com/product';
       await urlInput.dispatchEvent(new Event('input'));
 
-      storeInput.value = 'Test Store';
-      await storeInput.dispatchEvent(new Event('input'));
+      storeSelect.value = '1';
+      await storeSelect.dispatchEvent(new Event('change'));
 
       priceInput.value = '99.99';
       await priceInput.dispatchEvent(new Event('input'));
@@ -91,7 +131,7 @@ describe('AddProductModal', () => {
 
       expect(nameInput.value).toBe('Test Product');
       expect(urlInput.value).toBe('https://example.com/product');
-      expect(storeInput.value).toBe('Test Store');
+      expect(storeSelect.value).toBe('1');
       expect(priceInput.value).toBe('99.99');
       expect(targetPriceInput.value).toBe('79.99');
     });
@@ -100,12 +140,13 @@ describe('AddProductModal', () => {
       wrapper = mount(AddProductModal, {
         props: {
           isOpen: true,
+          stores: mockStores,
         },
       });
 
       const nameInput = document.querySelector('#product-name') as HTMLInputElement;
       const urlInput = document.querySelector('#product-url') as HTMLInputElement;
-      const storeInput = document.querySelector('#product-store') as HTMLInputElement;
+      const storeSelect = document.querySelector('#product-store') as HTMLSelectElement;
       const priceInput = document.querySelector('#product-price') as HTMLInputElement;
       const targetPriceInput = document.querySelector('#target-price') as HTMLInputElement;
 
@@ -115,8 +156,8 @@ describe('AddProductModal', () => {
       urlInput.value = 'https://example.com/product';
       await urlInput.dispatchEvent(new Event('input'));
 
-      storeInput.value = 'Test Store';
-      await storeInput.dispatchEvent(new Event('input'));
+      storeSelect.value = '1';
+      await storeSelect.dispatchEvent(new Event('change'));
 
       priceInput.value = '99.99';
       await priceInput.dispatchEvent(new Event('input'));
@@ -135,7 +176,7 @@ describe('AddProductModal', () => {
       expect(emittedProduct).toMatchObject({
         name: 'Test Product',
         url: 'https://example.com/product',
-        store: 'Test Store',
+        store: 'Amazon',
         price: 99.99,
         targetPrice: 79.99,
       });
@@ -147,12 +188,13 @@ describe('AddProductModal', () => {
       wrapper = mount(AddProductModal, {
         props: {
           isOpen: true,
+          stores: mockStores,
         },
       });
 
       const nameInput = document.querySelector('#product-name') as HTMLInputElement;
       const urlInput = document.querySelector('#product-url') as HTMLInputElement;
-      const storeInput = document.querySelector('#product-store') as HTMLInputElement;
+      const storeSelect = document.querySelector('#product-store') as HTMLSelectElement;
       const targetPriceInput = document.querySelector('#target-price') as HTMLInputElement;
 
       nameInput.value = 'Test Product';
@@ -161,8 +203,8 @@ describe('AddProductModal', () => {
       urlInput.value = 'https://example.com/product';
       await urlInput.dispatchEvent(new Event('input'));
 
-      storeInput.value = 'Test Store';
-      await storeInput.dispatchEvent(new Event('input'));
+      storeSelect.value = '1';
+      await storeSelect.dispatchEvent(new Event('change'));
 
       targetPriceInput.value = '79.99';
       await targetPriceInput.dispatchEvent(new Event('input'));
@@ -179,12 +221,13 @@ describe('AddProductModal', () => {
       wrapper = mount(AddProductModal, {
         props: {
           isOpen: true,
+          stores: mockStores,
         },
       });
 
       const nameInput = document.querySelector('#product-name') as HTMLInputElement;
       const urlInput = document.querySelector('#product-url') as HTMLInputElement;
-      const storeInput = document.querySelector('#product-store') as HTMLInputElement;
+      const storeSelect = document.querySelector('#product-store') as HTMLSelectElement;
       const priceInput = document.querySelector('#product-price') as HTMLInputElement;
 
       nameInput.value = 'Test Product';
@@ -193,8 +236,8 @@ describe('AddProductModal', () => {
       urlInput.value = 'https://example.com/product';
       await urlInput.dispatchEvent(new Event('input'));
 
-      storeInput.value = 'Test Store';
-      await storeInput.dispatchEvent(new Event('input'));
+      storeSelect.value = '1';
+      await storeSelect.dispatchEvent(new Event('change'));
 
       priceInput.value = '99.99';
       await priceInput.dispatchEvent(new Event('input'));
@@ -213,13 +256,14 @@ describe('AddProductModal', () => {
       wrapper = mount(AddProductModal, {
         props: {
           isOpen: true,
+          stores: mockStores,
         },
       });
 
       // Fill out form
       const nameInput = document.querySelector('#product-name') as HTMLInputElement;
       const urlInput = document.querySelector('#product-url') as HTMLInputElement;
-      const storeInput = document.querySelector('#product-store') as HTMLInputElement;
+      const storeSelect = document.querySelector('#product-store') as HTMLSelectElement;
       const priceInput = document.querySelector('#product-price') as HTMLInputElement;
       const targetPriceInput = document.querySelector('#target-price') as HTMLInputElement;
 
@@ -229,8 +273,8 @@ describe('AddProductModal', () => {
       urlInput.value = 'https://example.com/product';
       await urlInput.dispatchEvent(new Event('input'));
 
-      storeInput.value = 'Test Store';
-      await storeInput.dispatchEvent(new Event('input'));
+      storeSelect.value = '1';
+      await storeSelect.dispatchEvent(new Event('change'));
 
       priceInput.value = '99.99';
       await priceInput.dispatchEvent(new Event('input'));
@@ -249,13 +293,13 @@ describe('AddProductModal', () => {
       // Check that form is reset
       const nameInputAfter = document.querySelector('#product-name') as HTMLInputElement;
       const urlInputAfter = document.querySelector('#product-url') as HTMLInputElement;
-      const storeInputAfter = document.querySelector('#product-store') as HTMLInputElement;
+      const storeSelectAfter = document.querySelector('#product-store') as HTMLSelectElement;
       const priceInputAfter = document.querySelector('#product-price') as HTMLInputElement;
       const targetPriceInputAfter = document.querySelector('#target-price') as HTMLInputElement;
 
       expect(nameInputAfter.value).toBe('');
       expect(urlInputAfter.value).toBe('');
-      expect(storeInputAfter.value).toBe('');
+      // Select resets to null/empty option
       expect(priceInputAfter.value).toBe('');
       expect(targetPriceInputAfter.value).toBe('');
     });
@@ -266,6 +310,7 @@ describe('AddProductModal', () => {
       wrapper = mount(AddProductModal, {
         props: {
           isOpen: true,
+          stores: mockStores,
         },
       });
 
@@ -281,6 +326,7 @@ describe('AddProductModal', () => {
       wrapper = mount(AddProductModal, {
         props: {
           isOpen: true,
+          stores: mockStores,
         },
       });
 
@@ -296,35 +342,37 @@ describe('AddProductModal', () => {
       wrapper = mount(AddProductModal, {
         props: {
           isOpen: true,
+          stores: mockStores,
         },
       });
 
       const labels = document.querySelectorAll('label');
       const labelTexts = Array.from(labels).map((label) => label.textContent);
 
-      expect(labelTexts).toContain('Product Name');
-      expect(labelTexts).toContain('Product URL');
-      expect(labelTexts).toContain('Store');
-      expect(labelTexts).toContain('Current Price (€)');
-      expect(labelTexts).toContain('Target Price (€)');
+      expect(labelTexts.some((text) => text?.includes('Product Name'))).toBe(true);
+      expect(labelTexts.some((text) => text?.includes('Product URL'))).toBe(true);
+      expect(labelTexts.some((text) => text?.includes('Store'))).toBe(true);
+      expect(labelTexts.some((text) => text?.includes('Current Price'))).toBe(true);
+      expect(labelTexts.some((text) => text?.includes('Target Price'))).toBe(true);
     });
 
     it('should have required attribute on all inputs', () => {
       wrapper = mount(AddProductModal, {
         props: {
           isOpen: true,
+          stores: mockStores,
         },
       });
 
       const nameInput = document.querySelector('#product-name') as HTMLInputElement;
       const urlInput = document.querySelector('#product-url') as HTMLInputElement;
-      const storeInput = document.querySelector('#product-store') as HTMLInputElement;
+      const storeSelect = document.querySelector('#product-store') as HTMLSelectElement;
       const priceInput = document.querySelector('#product-price') as HTMLInputElement;
       const targetPriceInput = document.querySelector('#target-price') as HTMLInputElement;
 
       expect(nameInput.required).toBe(true);
       expect(urlInput.required).toBe(true);
-      expect(storeInput.required).toBe(true);
+      expect(storeSelect.required).toBe(true);
       expect(priceInput.required).toBe(true);
       expect(targetPriceInput.required).toBe(true);
     });
@@ -333,18 +381,19 @@ describe('AddProductModal', () => {
       wrapper = mount(AddProductModal, {
         props: {
           isOpen: true,
+          stores: mockStores,
         },
       });
 
       const nameInput = document.querySelector('#product-name') as HTMLInputElement;
       const urlInput = document.querySelector('#product-url') as HTMLInputElement;
-      const storeInput = document.querySelector('#product-store') as HTMLInputElement;
+      const storeSelect = document.querySelector('#product-store') as HTMLSelectElement;
       const priceInput = document.querySelector('#product-price') as HTMLInputElement;
       const targetPriceInput = document.querySelector('#target-price') as HTMLInputElement;
 
       expect(nameInput.type).toBe('text');
       expect(urlInput.type).toBe('url');
-      expect(storeInput.type).toBe('text');
+      // Store is now a select, not text input
       expect(priceInput.type).toBe('number');
       expect(targetPriceInput.type).toBe('number');
     });

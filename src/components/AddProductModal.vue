@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { Product } from '../types';
+import { Product, Shop } from '../types';
 import BaseModal from './BaseModal.vue';
 
 // Props
 interface Props {
   isOpen: boolean;
+  stores: Shop[];
 }
 
 const props = defineProps<Props>();
@@ -19,7 +20,7 @@ const emit = defineEmits<{
 // Form data
 const productName = ref('');
 const productUrl = ref('');
-const productStore = ref('');
+const selectedStoreId = ref<number | null>(null);
 const productPrice = ref<number | null>(null);
 const targetPrice = ref<number | null>(null);
 
@@ -34,20 +35,24 @@ watch(() => props.isOpen, (newValue) => {
 const resetForm = (): void => {
   productName.value = '';
   productUrl.value = '';
-  productStore.value = '';
+  selectedStoreId.value = null;
   productPrice.value = null;
   targetPrice.value = null;
 };
 
 // Handle form submission
 const handleSubmit = (): void => {
-  if (!productPrice.value || !targetPrice.value) return;
+  if (!productPrice.value || !targetPrice.value || !selectedStoreId.value) return;
+
+  // Find selected store
+  const selectedStore = props.stores.find((s) => s.id === selectedStoreId.value);
+  if (!selectedStore) return;
 
   const product: Product = {
     id: Date.now(),
     name: productName.value,
     url: productUrl.value,
-    store: productStore.value,
+    store: selectedStore.name,
     price: productPrice.value,
     targetPrice: targetPrice.value,
     dateAdded: new Date().toISOString(),
@@ -83,13 +88,32 @@ const handleSubmit = (): void => {
         />
       </div>
       <div class="form-group">
-        <label for="product-store">Store</label>
-        <input
+        <label for="product-store">
+          Store
+          <span class="required" aria-label="required">*</span>
+        </label>
+        <select
           id="product-store"
-          v-model="productStore"
-          type="text"
+          v-model="selectedStoreId"
           required
-        />
+          :aria-describedby="stores.length === 0 ? 'store-help-text' : undefined"
+        >
+          <option :value="null" disabled>Select a store</option>
+          <option
+            v-for="store in stores"
+            :key="store.id"
+            :value="store.id"
+          >
+            {{ store.name }}
+          </option>
+        </select>
+        <p
+          v-if="stores.length === 0"
+          id="store-help-text"
+          class="help-text"
+        >
+          No stores available. Please add a store first using the "+ Add Store" button.
+        </p>
       </div>
       <div class="form-group">
         <label for="product-price">Current Price (€)</label>

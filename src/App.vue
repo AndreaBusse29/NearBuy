@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Product, STORAGE_KEY } from './types';
+import { Product, Shop, STORAGE_KEY, SHOPS_STORAGE_KEY } from './types';
 import ProductCard from './components/ProductCard.vue';
 import AddProductModal from './components/AddProductModal.vue';
+import AddStoreModal from './components/AddStoreModal.vue';
 
 // State
 const products = ref<Product[]>([]);
-const isModalOpen = ref(false);
+const stores = ref<Shop[]>([]);
+const isProductModalOpen = ref(false);
+const isStoreModalOpen = ref(false);
 
 // Load products from localStorage
 const loadProducts = (): void => {
@@ -26,26 +29,61 @@ const saveProducts = (): void => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(products.value));
 };
 
-// Open add product modal
-const openModal = (): void => {
-  isModalOpen.value = true;
+// Load stores from localStorage
+const loadStores = (): void => {
+  const stored = localStorage.getItem(SHOPS_STORAGE_KEY);
+  if (stored) {
+    try {
+      stores.value = JSON.parse(stored) as Shop[];
+    } catch (error) {
+      console.error('Error loading stores:', error);
+      stores.value = [];
+    }
+  }
 };
 
-// Close modal
-const closeModal = (): void => {
-  isModalOpen.value = false;
+// Save stores to localStorage
+const saveStores = (): void => {
+  localStorage.setItem(SHOPS_STORAGE_KEY, JSON.stringify(stores.value));
+};
+
+// Open add product modal
+const openProductModal = (): void => {
+  isProductModalOpen.value = true;
+};
+
+// Close product modal
+const closeProductModal = (): void => {
+  isProductModalOpen.value = false;
+};
+
+// Open add store modal
+const openStoreModal = (): void => {
+  isStoreModalOpen.value = true;
+};
+
+// Close store modal
+const closeStoreModal = (): void => {
+  isStoreModalOpen.value = false;
 };
 
 // Handle add product
 const handleAddProduct = (product: Product): void => {
   products.value.push(product);
   saveProducts();
-  closeModal();
+  closeProductModal();
 
   // Check if price is already at or below target
   if (product.price <= product.targetPrice) {
     showNotification(`${product.name} is already at your target price!`);
   }
+};
+
+// Handle add store
+const handleAddStore = (store: Shop): void => {
+  stores.value.push(store);
+  saveStores();
+  closeStoreModal();
 };
 
 // View product (opens URL in new tab)
@@ -79,6 +117,7 @@ const showNotification = (message: string): void => {
 // Initialize app
 onMounted(() => {
   loadProducts();
+  loadStores();
 });
 </script>
 
@@ -92,9 +131,24 @@ onMounted(() => {
     <section id="products-section">
       <div class="section-header">
         <h2>My Products</h2>
-        <button id="add-product-btn" class="btn-primary" @click="openModal">
-          + Add Product
-        </button>
+        <div class="header-actions">
+          <button
+            id="add-store-btn"
+            class="btn-secondary"
+            @click="openStoreModal"
+            aria-label="Add a new store"
+          >
+            + Add Store
+          </button>
+          <button
+            id="add-product-btn"
+            class="btn-primary"
+            @click="openProductModal"
+            aria-label="Add a new product to track"
+          >
+            + Add Product
+          </button>
+        </div>
       </div>
 
       <div id="products-list" class="products-grid">
@@ -114,9 +168,16 @@ onMounted(() => {
     </section>
 
     <AddProductModal
-      :is-open="isModalOpen"
-      @close="closeModal"
+      :is-open="isProductModalOpen"
+      :stores="stores"
+      @close="closeProductModal"
       @add-product="handleAddProduct"
+    />
+
+    <AddStoreModal
+      :is-open="isStoreModalOpen"
+      @close="closeStoreModal"
+      @add-store="handleAddStore"
     />
   </main>
 
