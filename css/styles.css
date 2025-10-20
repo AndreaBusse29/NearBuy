@@ -80,12 +80,12 @@ main {
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
+  background-color: var(--primary-dark);
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-dark);
+  background-color: #1565C0;
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
@@ -316,4 +316,50 @@ footer {
   .modal-content {
     width: 95%;
   }
+}
+
+/* Accessibility - Focus Styles */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button:focus-visible,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-delete:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
+a:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Screen reader only class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

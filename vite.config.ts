@@ -23,4 +23,12 @@ export default defineConfig({
   server: {
     port: 8080,
   },
+  test: {
+    globals: true,
+    environment: 'happy-dom',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+    },
+  },
 });
