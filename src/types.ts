@@ -1,3 +1,11 @@
+// Shop data model
+export interface Shop {
+  id: number;
+  name: string;
+  url: string;
+  dateAdded: string;
+}
+
 // Product data model
 export interface Product {
   id: number;
@@ -22,6 +30,19 @@ export interface DOMElements {
   productStoreInput: HTMLInputElement;
   productPriceInput: HTMLInputElement;
   targetPriceInput: HTMLInputElement;
+  // Shop management elements (optional - future feature)
+  manageShopsBtn?: HTMLButtonElement;
+  manageShopsModal?: HTMLElement;
+  addShopBtn?: HTMLButtonElement;
+  addShopModal?: HTMLElement;
+  addShopForm?: HTMLFormElement;
+  cancelShopBtn?: HTMLButtonElement;
+  closeShopModalBtn?: HTMLElement;
+  closeManageShopsBtn?: HTMLElement;
+  shopsList?: HTMLElement;
+  shopNameInput?: HTMLInputElement;
+  shopUrlInput?: HTMLInputElement;
+  productStoreSelect?: HTMLSelectElement;
 }
 
 // Service Worker types
@@ -44,3 +65,4 @@ export interface PriceAlertOptions extends NotificationOptions {
 
 // Local Storage keys
 export const STORAGE_KEY = 'nearbuy-products' as const;
+export const SHOPS_STORAGE_KEY = 'nearbuy-shops' as const;
